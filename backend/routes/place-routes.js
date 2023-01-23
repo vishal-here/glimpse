@@ -24,7 +24,7 @@ router.patch(
   [
     check("title").not().isEmpty(),
     check("address").not().isEmpty(),
-    check("desc").isLength({ min: 5 }),
+    check("description").isLength({ min: 5 }),
   ],
   obj.getUpdatedElement
 );

@@ -1,7 +1,7 @@
 const { validationResult } = require("express-validator");
 
 const HttpError = require("../models/HttpError");
-
+const Place = require("../models/Place");
 let places = [
   {
     id: "p1",
@@ -42,59 +42,107 @@ let places = [
   },
 ];
 let idGenerator = 4;
-const getElementByPlace = (req, res, next) => {
+const getElementByPlace = async (req, res, next) => {
   const pid = req.params.pid;
-  const obj = places.filter((x) => {
-    return x.id === pid;
-  });
-  if (obj.length === 0) next(new HttpError("invalid place id", 404));
+  // const obj = places.find((x) => {
+  //   return x.id === pid;
+  // });
+  let obj ;
+  try {
+    obj= await Place.findById(pid)
+  } catch (e) {
+    return next(e) ;
+  }
+  if (!obj) next(new HttpError("invalid place id", 404));
   else res.json(obj);
 };
 
-const getElementByUser = (req, res) => {
+const getElementByUser =async (req, res ,next) => {
   const uid = req.params.uid;
-  const obj = places.find((x) => {
-    return x.creater === uid;
-  });
-  if (!obj) {
-    next(new HttpError("invalid user id ", 404));
-  } else res.json(obj);
+  // const obj = places.filter((x) => {
+  //   return x.creater === uid;
+  // });
+  let arr;
+  try {
+    arr = await Place.find({creater : uid})
+  } catch (e) {
+    return next(e);
+  }
+  if (!arr || arr.length===0) {
+    next(new HttpError("user doesnot exist  ", 404));
+  } else res.json({places : arr.map(x => x.toObject())});
 };
 
-const getCreatedElement = (req, res, next) => {
+const getCreatedElement = async (req, res, next) => {
   const { title, desc, address, coordinates, uploader } = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new HttpError("invalid inputs :( ", 422);
   }
-  const createdPlace = {
-    id: `p${idGenerator++}`,
+  // const createdPlace = {
+  //   id: `p${idGenerator++}`,
+  //   title,
+  //   desc,
+  //   address,
+  //   location: coordinates,
+  //   creater: uploader,
+  // };
+  const createdPlace = new Place({
     title,
-    desc,
+    description: desc,
     address,
     location: coordinates,
+    image:
+      "https://i0.wp.com/farm4.static.flickr.com/3408/3410783929_051d93bc86.jpg",
     creater: uploader,
-  };
-  places.push(createdPlace);
+  });
+  // places.push(createdPlace);
+  try {
+    await createdPlace.save();
+  } catch (err) {
+    const errors = new HttpError("failed to create place , try again ", 500);
+    return next(errors);
+  }
   res.status(201).json({ place: createdPlace });
 };
-const getUpdatedElement = (req, res, next) => {
+const getUpdatedElement = async (req, res, next) => {
   const { title, description, address } = req.body;
-  const errors = validationResult(req) ;
+  const errors = validationResult(req);
+  console.log(errors)
   if (!errors.isEmpty()) {
-    throw new HttpError("invalid inputs :( ", 422);
+     return next(new HttpError("invalid inputs :( ", 422)) 
   }
   const pid = req.params.pid;
-  const copy = { ...places.find((p) => p.id === pid) };
-  copy.title = title;
-  copy.desc = description;
-  copy.address = address;
-  res.status(200).json(copy);
+  // const copy = { ...places.find((p) => p.id === pid) };
+  // copy.title = title;
+  // copy.desc = description;
+  let obj ;
+  try {
+    obj= await Place.findById(pid)
+  } catch (e) {
+    return next(e) ;
+  }
+  // copy.address = address;
+  // obj.toObject() ;
+  // obj.title = title ;
+  // obj.desciption = description ;
+  // obj.address = address ;
+  // console.log(obj)
+  try {
+    await obj.update({
+      title,
+      description,
+      address
+    }) ;
+  } catch (e) {
+    return next(e)
+  }
+  res.status(200).json(obj);
 };
 const getDeletedElement = (req, res, next) => {
   const pid = req.params.pid;
-  const temp = places.find((p)=> p.id===pid);
-  if(!temp) throw new HttpError("place does not exist") ;
+  const temp = places.find((p) => p.id === pid);
+  if (!temp) throw new HttpError("place does not exist");
   const copy = places.filter((p) => p.id !== pid);
   places = copy;
   res.status(200).json({ message: "deleted successfully !!" });

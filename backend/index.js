@@ -1,6 +1,7 @@
 const express = require('express');
-const HttpError = require('./models/HttpError');
+const mongoose = require('mongoose')
 
+const HttpError = require('./models/HttpError');
 const placeRoutes = require('./routes/place-routes')
 const userRoutes = require('./routes/user-routes')
 
@@ -22,6 +23,13 @@ app.use((err,req,res,next)=>{
 })
 
 //start server
-app.listen(4000 , ()=>
-console.log("listening on port 4000")
-) ;
+try {
+    mongoose.connect("mongodb+srv://vishal_here:EdU3fhPLivnch5Sg@cluster0.yhzzkqy.mongodb.net/?retryWrites=true&w=majority"
+    ).then( ()=>{
+        app.listen(4000 , ()=>
+        console.log("listening on port 4000")) ;
+    })
+} catch (error) {
+    console.log(error)
+}
+
