@@ -4,7 +4,7 @@ const PlaceTable = mongoose.Schema({
     title : {type : String , required: true},
     description : {type : String , required: true},
     address : {type : String , required: true},
-    creater : {type : String , required: true},
+    creater : { type : mongoose.Types.ObjectId, required : true,  ref : 'User'},
     image : {type :String},
     location :{
         lat :{type :Number , required : true},
