@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const { default: mongoose } = require("mongoose");
 
+const fs = require('fs') ;
 const HttpError = require("../models/HttpError");
 const Place = require("../models/Place");
 const User = require("../models/User");
@@ -71,13 +72,21 @@ const getElementByUser =async (req, res ,next) => {
     return next(e);
   }
   if (!arr || arr.length===0) {
-    next(new HttpError("user doesnot exist  ", 404));
+    next(new HttpError("No places has been added by the user  ", 404));
   } else res.json({places : arr.map(x => x.toObject())});
 };
 
 const getCreatedElement = async (req, res, next) => {
-  const { title, desc, address, coordinates, uploader } = req.body;
+  const { title, desc, address, uploader } = req.body;
+  let coordinates = {
+    lat: 30.406616,
+    long: -10.51515,
+  } ;
+  console.log(req.body);
   const errors = validationResult(req);
+  if(!req.file){
+   return  next(new HttpError("Must upload a place picture", 422));
+  }
   if (!errors.isEmpty()) {
      return next(new HttpError("invalid inputs :( ", 422) ) ;
   }
@@ -89,13 +98,13 @@ const getCreatedElement = async (req, res, next) => {
   //   location: coordinates,
   //   creater: uploader,
   // };
+  console.log(coordinates)
   const createdPlace = new Place({
     title,
     description: desc,
     address,
     location: coordinates,
-    image:
-      "https://i0.wp.com/farm4.static.flickr.com/3408/3410783929_051d93bc86.jpg",
+    image: req.file.path,
     creater: uploader,
   });
   let user ;
@@ -136,7 +145,6 @@ const getUpdatedElement = async (req, res, next) => {
   let obj ;
   try {
     obj= await Place.findById(pid)
-    console.log(obj)
   } catch (e) {
     return next(e) ;
   }
@@ -146,6 +154,10 @@ const getUpdatedElement = async (req, res, next) => {
   // obj.desciption = description ;
   // obj.address = address ;
   // console.log(obj);
+
+  if(obj.creater.toString() !== req.userData.userId) {
+    return next(new HttpError('You are not allowed to Edit the place details !' , 401))
+  }
   try {
     await obj.update({
       title,
@@ -168,6 +180,11 @@ const getDeletedElement = async (req, res, next) => {
   }
 
   if (!place) return  next(new HttpError("place does not exist")) ;
+  if(place.creater._id.toString() !== req.userData.userId) {
+    return next(new HttpError('You are not allowed to delete this place !' , 401))
+  }
+  
+  const imagePath = place.image
 
   try {
       const sess = await mongoose.startSession() ;
@@ -182,6 +199,9 @@ const getDeletedElement = async (req, res, next) => {
 
   // const copy = places.filter((p) => p.id !== pid);
   // places = copy;
+  fs.unlink(imagePath , err =>{
+    console.log(err)
+  })
   res.status(200).json({ message: "deleted successfully !!" });
 };
 const obj = {

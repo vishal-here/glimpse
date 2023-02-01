@@ -1,7 +1,10 @@
 const express = require("express");
 const { check } = require("express-validator");
+const fileUpload = require('../middlewares/file-upload')
+
 const router = express.Router();
 
+const checkAuth = require('../middlewares/check-auth')
 const HttpError = require("../models/HttpError");
 const obj = require("../controllers/place-controller");
 
@@ -9,12 +12,14 @@ router.get("/user/:uid", obj.getElementByUser);
 
 router.get("/:pid", obj.getElementByPlace);
 
+router.use(checkAuth)
+
 router.post(
   "/",
+    fileUpload.single('placePic') ,
   [
     check("title").not().isEmpty(),
     check("address").not().isEmpty(),
-    check("desc").isLength({ min: 5 }),
   ],
   obj.getCreatedElement
 );
@@ -24,7 +29,6 @@ router.patch(
   [
     check("title").not().isEmpty(),
     check("address").not().isEmpty(),
-    check("description").isLength({ min: 5 }),
   ],
   obj.getUpdatedElement
 );

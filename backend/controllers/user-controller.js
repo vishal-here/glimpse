@@ -1,6 +1,8 @@
 const { validationResult } = require("express-validator");
 const HttpError = require("../models/HttpError");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const bcrypt = require('bcryptjs')
 // const users = [
 //   {
 //     id: "u1",
@@ -25,25 +27,29 @@ const User = require("../models/User");
 // let idGenerator = 4;
 
 const getUsers = async (req, res, next) => {
-  let users ;
+  let users;
   try {
-    users = await User.find({} , '-password') ;
+    users = await User.find({}, "-password");
   } catch (e) {
-   return next(e) ; 
+    return next(e);
   }
-  if(users.length===0) return next(new HttpError("No users are here currently "))
-  res.status(200).json(
-    {
-      user : users.map(user => user.toObject())
-    }
-  )
+  if (users.length === 0)
+    return next(new HttpError("No users are here currently ", 404));
+  res.status(200).json({
+    user: users.map((user) => user.toObject()),
+  });
 };
 
 const signup = async (req, res, next) => {
+  console.log(req.body);
   const { name, email, password } = req.body;
   const errors = validationResult(req);
+  if (!req.file) {
+    next(new HttpError("Must upload a profile picture", 422));
+    return;
+  }
   if (!errors.isEmpty()) {
-    next(new HttpError("Invalid Credentials", 422));
+    next(new HttpError("Invalid Credentials !", 422));
     return;
   }
   // const hasUser = users.find(u => u.email === email);
@@ -58,36 +64,106 @@ const signup = async (req, res, next) => {
   }
   if (obj) return next(new HttpError("Email already exist .. "));
 
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    return next(new HttpError("Could'nt hash the password ! Unsafe", 500));
+  }
   const createdUser = new User({
     name, // name: name
     email,
-    password,
-    places : [],
-    image: "dummy image",
+    password: hashedPassword,
+    places: [],
+    image: req.file.path,
   });
 
   // users.push(createdUser);
   try {
     await createdUser.save();
+    console.log("user created successfully");
   } catch (e) {
+    console.log("could'nt create new user : (");
     return next(e);
   }
 
-  res.status(201).json({ user: createdUser });
+  let token;
+ try {
+  token = jwt.sign(
+    { userId: createdUser._id, email: createdUser.email },
+    "supersecret_dont_share",
+    { expiresIn: "1h" }
+  );
+
+ } catch (err) {
+  return next(new HttpError("Signup failed ! Can't generate token " , 500))
+ }
+  res.status(201).json({ user: createdUser, token});
 };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
-
-  const identifiedUser = users.find((u) => u.email === email);
-  if (!identifiedUser || identifiedUser.password !== password) {
-    throw new HttpError(
-      "Could not identify user, credentials seem to be wrong.",
-      401
-    );
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpError("Invalid Credentials", 401));
   }
 
-  res.json({ message: "Logged in!" });
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    return next(new HttpError("Could'nt hash the password ! Unsafe", 500));
+  }
+
+  let result;
+  try {
+    console.log(password )
+    result = await User.findOne({ email, hashedPassword });
+  } catch (err) {
+    return next(err);
+  }
+  if (!result) {
+    return next(new HttpError("No such user Exist , Please signup "));
+  }
+
+  let isValid = false;
+  try {
+    isValid = await bcrypt.compare(password, result.password);
+  } catch (err) {
+    return next(new HttpError("Please try again ", 500));
+  }
+
+  if (!isValid) {
+    return next(new HttpError("Invalid credentials !! ", 401));
+  }
+
+  
+  let token;
+ try {
+  token = jwt.sign(
+    { userId: result._id, email: result.email },
+    "supersecret_dont_share",
+    { expiresIn: "1h" }
+  );
+console.log(token)
+ } catch (err) {
+  return next(new HttpError("Login failed ! Can't generate token " , 500))
+ }
+ 
+
+  res
+    .status(200)
+    .json({ message: "Logged in successfully", user: result.toObject() , token });
+
+  // const identifiedUser = users.find((u) => u.email === email);
+  // if (!identifiedUser || identifiedUser.password !== password) {
+  //   throw new HttpError(
+  //     "Could not identify user, credentials seem to be wrong.",
+  //     401
+  //   );
+  // }
+
+  // res.json({ message: "Logged in!" });
 };
 
 const obj = { getUsers, login, signup };
