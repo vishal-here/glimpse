@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose')
 const fs = require('fs') ;
 const path = require('path')
+require('dotenv').config() ;
+
 const HttpError = require('./models/HttpError');
 const placeRoutes = require('./routes/place-routes')
 const userRoutes = require('./routes/user-routes')
@@ -37,7 +39,8 @@ app.use((err,req,res,next)=>{
 
 //start server
 try {
-    mongoose.connect("mongodb+srv://vishal_here:EdU3fhPLivnch5Sg@cluster0.yhzzkqy.mongodb.net/glimpse?retryWrites=true&w=majority"
+
+    mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.yhzzkqy.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
     ).then( ()=>{
         app.listen(4000 , ()=>
         console.log("listening on port 4000")) ;
