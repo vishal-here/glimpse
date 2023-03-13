@@ -100,7 +100,7 @@ const [error,setError] = useState("")
         })
         fillProgress(50) ;
         try {
-          await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/place/${pid}`, {
+          await fetch(`/api/place/${pid}`, {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
