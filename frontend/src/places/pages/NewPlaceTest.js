@@ -77,7 +77,7 @@ const NewPlaceTest = ({ fillProgress }) => {
           console.log(key, " : ", value);
         }
 
-        const response = await fetch(process.env.REACT_APP_BACKEND_URL+"/api/place", {
+        const response = await fetch("/api/place", {
           method: "POST",
           headers: {
             Authorization : 'Bearer '+auth.token

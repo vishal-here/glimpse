@@ -63,7 +63,7 @@ const [error,setError] = useState("")
       const updatedPlace = async  () => { 
         try {
           fillProgress(30);
-          const fetchResult = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/place/${pid}`)
+          const fetchResult = await fetch(`/api/place/${pid}`)
           fillProgress(70) ;
           const response = await fetchResult.json() ;
           if(!fetchResult.ok) throw new Error(response.message) ;

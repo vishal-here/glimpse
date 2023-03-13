@@ -21,7 +21,7 @@ const User = ({ fillProgress, checkProgress }) => {
     const loadPage = async () => {
       try {
         fillProgress(10);
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/`);
+        const response = await fetch(`/api/user/`);
         fillProgress(50);
         const resBody = await response.json();
         setLoadedUser(resBody.user);

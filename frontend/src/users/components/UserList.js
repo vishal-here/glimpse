@@ -21,7 +21,7 @@ const UserList = (props) => {
               <div className="w-2/5">
                 <img
                   className="w-12 h-12 my-auto rounded-full ring-2 ring-gray-300 dark:ring-gray-500"
-                  src={`${process.env.REACT_APP_BACKEND_URL}/${x.image}`}
+                  src={`/${x.image}`}
                   alt="Bordered avatar"
                 />
               </div>
