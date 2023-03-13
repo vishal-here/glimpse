@@ -10,7 +10,6 @@
 
 # production
 /.env
-.env.production
 
 # misc
 .DS_Store
