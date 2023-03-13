@@ -30,7 +30,7 @@ app.get('*',(req,res)=>{
     var filePath = "./frontend/build/index.html"
     var resolvedPath = path.resolve(filePath);
     console.log(resolvedPath);
-     res.sendFile(resolvedPath); 
+    res.sendFile(resolvedPath); 
 
     //     // res.sendFile(path.join(__dirname+'./frontend/build/index.html') , (err)=> {
     //     //     res.status(500).send(err)
@@ -54,13 +54,13 @@ app.use((err,req,res,next)=>{
 })
 
 //serving frontend
-app.use(express.static(path.join(__dirname + './frontend/build'))) ;
+// app.use(express.static(path.join(__dirname + './frontend/build'))) ;
 
-app.get('*',(req,res)=>{
-        res.sendFile(path.join(__dirname+'./frontend/build/index.html') , (err)=> {
-            res.status(500).send(err)
-    })
-})
+// app.get('*',(req,res)=>{
+//         res.sendFile(path.join(__dirname+'./frontend/build/index.html') , (err)=> {
+//             res.status(500).send(err)
+//     })
+// })
 //start server
 try {
 
