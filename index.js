@@ -41,7 +41,7 @@ app.use((err,req,res,next)=>{
 app.use(express.static(path.join(__dirname + './frontend/build/index'))) ;
 
 app.get('*',(req,res)=>{
-    console.log(__dirname + './frontend/build/index'); 
+    console.log(__dirname + './frontend/build'); 
     res.sendFile(path.join(__dirname+'./frontend/build/index.html'))
 })
 //start server
