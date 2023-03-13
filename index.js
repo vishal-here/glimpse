@@ -37,6 +37,12 @@ app.use((err,req,res,next)=>{
     res.status(err.code || 500).json({ message : err.message})
 })
 
+//serving frontend
+app.use(express.static(path.join(__dirname + './frontend/build/index'))) ;
+
+app.get('*',(req,res)=>{
+    res.sendFile(path.join(__dirname+'./frontend/build/index.html'))
+})
 //start server
 try {
 
