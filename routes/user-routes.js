@@ -24,7 +24,7 @@ const fileUpload =  require('../middlewares/file-upload')
 //   },
 // ];
 
-// router.get("/", obj.getUsers);
+router.get("/", obj.getUsers);
 
 router.post(
   "/login",
