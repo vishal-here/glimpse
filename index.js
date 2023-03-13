@@ -41,8 +41,9 @@ app.use((err,req,res,next)=>{
 app.use(express.static(path.join(__dirname + './frontend/build'))) ;
 
 app.get('*',(req,res)=>{
-    console.log(__dirname + './frontend/build'); 
-    res.sendFile(path.join(__dirname+'./frontend/build/index.html'))
+        res.sendFile(path.join(__dirname+'./frontend/build/index.html') , (err)=> {
+            res.status(500).send(err)
+    })
 })
 //start server
 try {
