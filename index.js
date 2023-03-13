@@ -72,7 +72,7 @@ try {
     mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.yhzzkqy.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
     ).then( ()=>{
         app.listen(process.env.PORT || 4000 , ()=>
-        console.log("listening on port 4000")) ;
+        console.log("listening on port " + process.env.PORT)) ;
     })
 } catch (error) {
     console.log(error)
