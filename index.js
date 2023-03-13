@@ -25,7 +25,7 @@ app.use('/api/user',userRoutes)
 
 app.use(express.static(path.join(__dirname + './frontend/build'))) ;
 
-app.get('/',(req,res)=>{
+app.get('*',(req,res)=>{
        
     var filePath = "./frontend/build/index.html"
     var resolvedPath = path.resolve(filePath);
