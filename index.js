@@ -19,23 +19,36 @@ app.use((req,res,next)=>{
     res.setHeader('Access-Control-Allow-Methods','GET,POST,PATCH,DELETE') ;
     next() ;
 })
+
+// app.use(express.static(path.join(__dirname + './frontend/build'))) ;
+
+// app.get('*',(req,res)=>{
+       
+//     var filePath = "./frontend/build/index.html"
+//     var resolvedPath = path.resolve(filePath);
+//     console.log(resolvedPath);
+//     res.sendFile(resolvedPath); 
+
+//     //     // res.sendFile(path.join(__dirname+'./frontend/build/index.html') , (err)=> {
+//     //     // res.status(500).send(err)
+//     // })
+// })
+
+app.use(express.static(path.join(__dirname, "./frontend/build")))
+
+app.get("*", (req, res) => {
+    res.sendFile(
+        path.join(__dirname, "./frontend/build/index.html"),
+        function (err) {
+            res.status(500).send(err)
+        }
+    )
+})
+
 //routers
 app.use('/api/place',placeRoutes)
 app.use('/api/user',userRoutes)
 
-app.use(express.static(path.join(__dirname + './frontend/build'))) ;
-
-app.get('*',(req,res)=>{
-       
-    var filePath = "./frontend/build/index.html"
-    var resolvedPath = path.resolve(filePath);
-    console.log(resolvedPath);
-    res.sendFile(resolvedPath); 
-
-    //     // res.sendFile(path.join(__dirname+'./frontend/build/index.html') , (err)=> {
-    //     // res.status(500).send(err)
-    // })
-})
 
 // error handler if all route fails
 
@@ -61,6 +74,8 @@ app.use((err,req,res,next)=>{
 //             res.status(500).send(err)
 //     })
 // })
+
+
 
 
 

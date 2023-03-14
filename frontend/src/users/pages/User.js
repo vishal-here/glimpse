@@ -93,7 +93,7 @@ const User = ({ fillProgress, checkProgress }) => {
 
   return (
     <>
-      <ToastContainer
+      {/* <ToastContainer
         position="top-center"
         autoClose={5000}
         hideProgressBar={false}
@@ -104,7 +104,7 @@ const User = ({ fillProgress, checkProgress }) => {
         draggable
         pauseOnHover
         theme="light"
-      />
+      /> */}
       <div>
         <img
           src={pic}
