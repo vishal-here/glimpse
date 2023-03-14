@@ -57,7 +57,7 @@ const Place = ({ fillProgress , checkProgress }) => {
       try {
         fillProgress(30);
         const fetchResult = await fetch(
-          `/api/place/user/${uuid}`
+          `${process.env.REACT_APP_BACKEND_URL}/api/place/user/${uuid}`
         );
         fillProgress(70);
         const response = await fetchResult.json();

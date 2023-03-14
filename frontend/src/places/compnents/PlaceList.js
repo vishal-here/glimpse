@@ -29,7 +29,7 @@ const PlaceList = (props) => {
         return (
           <div className="flex justify-center " key={x._id}>
             <div className="rounded-lg shadow bg-white w-full  m-10 hover:shadow-lg duration-300 ease-out ">
-              <img className="rounded-t-lg w-full max-h-[600px]" src={`/${x.image}`} alt={x.title} />
+              <img className="rounded-t-lg w-full max-h-[600px]" src={`${process.env.REACT_APP_BACKEND_URL}/${x.image}`} alt={x.title} />
 
               <div className="p-6 flex flex-col content-center">
                 <h5 className="text-gray-900 text-xl font-medium mb-2 uppercase text-center">

@@ -81,7 +81,7 @@ const Auth = (props) => {
         formData.append('password',suCred.password)
         formData.append('profile-pic', pickedFile)
         props.fillProgress(10);
-        const response = await fetch(`/api/user/signup`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/signup`, {
           method: "POST",
           body : formData
         });
@@ -152,7 +152,7 @@ const Auth = (props) => {
     if (!loginError) {
       try {
         props.fillProgress(50);
-        const response = await fetch(`/api/user/login`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
