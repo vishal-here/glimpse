@@ -10,7 +10,7 @@ export default function Modal(props) {
   const handleDelete = async () => {
     try {
       setShowModal(false)
-      await fetch(`${process.env.REACT_APP_BACKEND_URL}/${props.placeId}`, {
+      await fetch(`https://tiny-jade-beetle-hose.cyclic.app/${props.placeId}`, {
         method: "DELETE",
         headers :{
           'Content-Type': 'application/json',
