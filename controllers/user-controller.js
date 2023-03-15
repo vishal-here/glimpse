@@ -3,6 +3,7 @@ const HttpError = require("../models/HttpError");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcryptjs')
+const cloudinary = require("../utils/cloudinary")
 // const users = [
 //   {
 //     id: "u1",
@@ -70,12 +71,22 @@ const signup = async (req, res, next) => {
   } catch (err) {
     return next(new HttpError("Could'nt hash the password ! Unsafe", 500));
   }
+ 
+  let result;
+  try {
+   result = await cloudinary.v2.uploader.upload(req.file.path , {
+      folder:"uploads"
+    })
+    console.log(result)
+  } catch (err) {
+    return next(new Error(err)) ;
+  }
   const createdUser = new User({
     name, // name: name
     email,
     password: hashedPassword,
     places: [],
-    image: req.file.path,
+    image: result.secure_url,
   });
 
   // users.push(createdUser);
