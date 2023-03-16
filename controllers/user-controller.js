@@ -74,6 +74,7 @@ const signup = async (req, res, next) => {
  
   let result;
   try {
+    console.log(req.file.path)
    result = await cloudinary.v2.uploader.upload(req.file.path , {
       folder:"uploads"
     })
