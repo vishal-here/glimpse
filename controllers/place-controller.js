@@ -5,6 +5,8 @@ const fs = require('fs') ;
 const HttpError = require("../models/HttpError");
 const Place = require("../models/Place");
 const User = require("../models/User");
+const getDataUri = require('../utils/DataUri')
+const cloudinary = require('../utils/cloudinary')
 // let places = [
 //   {
 //     id: "p1",
@@ -82,7 +84,7 @@ const getCreatedElement = async (req, res, next) => {
     lat: 30.406616,
     long: -10.51515,
   } ;
-  console.log(req.body);
+  console.table(req.body);
   const errors = validationResult(req);
   if(!req.file){
    return  next(new HttpError("Must upload a place picture", 422));
@@ -90,6 +92,23 @@ const getCreatedElement = async (req, res, next) => {
   if (!errors.isEmpty()) {
      return next(new HttpError("invalid inputs :( ", 422) ) ;
   }
+
+  
+  
+  const recievedFile = req.file ;
+  const fileUri= getDataUri(recievedFile) ;
+  // console.log(fileUri) ;
+  let result;
+  try {
+  //  console.log(req.file);
+   result = await cloudinary.uploader.upload(fileUri.content , {
+      folder:"uploads/images"
+    })
+    console.log(result)
+  } catch (err) {
+    return next(new Error(err)) ;
+  }
+
   // const createdPlace = {
   //   id: `p${idGenerator++}`,
   //   title,
@@ -104,7 +123,7 @@ const getCreatedElement = async (req, res, next) => {
     description: desc,
     address,
     location: coordinates,
-    image: req.file.path,
+    image: result.secure_url,
     creater: uploader,
   });
   let user ;

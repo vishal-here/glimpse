@@ -3,7 +3,7 @@ const HttpError = require("../models/HttpError");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcryptjs')
-const cloudinary = require("../utils/cloudinary")
+const cloudinary = require("../utils/cloudinary");
 const getDataUri = require('../utils/DataUri') ;
 // const users = [
 //   {
@@ -43,9 +43,11 @@ const getUsers = async (req, res, next) => {
 };
 
 const signup = async (req, res, next) => {
-  console.log(req.body);
+  console.table(req.body);
+  console.log(req.file);
   const { name, email, password } = req.body;
   const errors = validationResult(req);
+
   if (!req.file) {
     next(new HttpError("Must upload a profile picture", 422));
     return;
@@ -75,11 +77,12 @@ const signup = async (req, res, next) => {
   
   const recievedFile = req.file ;
   const fileUri= getDataUri(recievedFile) ;
+  // console.log(fileUri) ;
    
   let result;
   try {
   //  console.log(req.file);
-   result = await cloudinary.v2.uploader.upload(fileUri.content , {
+   result = await cloudinary.uploader.upload(fileUri.content , {
       folder:"uploads"
     })
     console.log(result)
